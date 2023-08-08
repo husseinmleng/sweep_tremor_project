@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy import signal
 import mediapipe as mp
 import math
+from flask import Flask, request, jsonify
 
 def pixel_size(video_width, video_height, camera_resolution):
   #Calculates the pixel size for a video and camera.
@@ -83,6 +84,7 @@ def plot_tremor_signal(time, tremor_signal_cm):
 def main(video_path):
     # Initialize models
     mp_hands, hands, mp_drawing, mp_drawing_styles = initialize_models()
+    return result
 
     # Load video
     cap, camera_resolution, image_width, image_height = load_video(video_path)
@@ -175,9 +177,11 @@ def process_video():
     if 'file' not in request.files:
         return jsonify({'error': 'no file'}), 400
     file = request.files['file']
-    video_path = file.save(file.filename)
-    main(video_path)
-    return jsonify({'result': 'success'}), 200
+    file.save(file.filename)
+    if not os.path.exists(file.filename):
+        return jsonify({'error': 'file not saved'}), 500
+    result = main(file.filename)
+    return jsonify({'result': result}), 200
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

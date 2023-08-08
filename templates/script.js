@@ -17,7 +17,12 @@ document.addEventListener("DOMContentLoaded", function() {
             method: "POST",
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             // Set the source of the input video
             inputVideo.src = data.input_video;
@@ -25,13 +30,16 @@ document.addEventListener("DOMContentLoaded", function() {
             // Set the source of the processed video
             processedVideo.src = data.processed_video;
 
-            // Draw the plot on the canvas
-            drawPlot(data.plot_data);
+            // Check if the plot_data property exists in the response data
+            if (data.plot_data) {
+                // Draw the plot on the canvas
+                drawPlot(data.plot_data);
+            }
 
-            // Display additional results
-            document.getElementById("results").innerHTML = JSON.stringify(data);
+            // Provide some context for the response data
+            document.getElementById("results").innerHTML = "Response data: " + JSON.stringify(data);
         })
-        .catch(error => console.log(error));
+        .catch(error => console.log('There has been a problem with your fetch operation: ', error));
     });
 
     function drawPlot(plotData) {
