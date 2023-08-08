@@ -4,14 +4,16 @@ document.addEventListener("DOMContentLoaded", function() {
     var processedVideo = document.getElementById("processed-video");
     var plotCanvas = document.getElementById("plot-canvas");
 
-    // Add an event listener to the file input element
-    inputFile.addEventListener("change", function() {
-        // Create a FormData object to send the file to the API
-        var formData = new FormData();
-        formData.append("file", inputFile.files[0]);
+    // Add an event listener to the form's submit event
+    document.getElementById("form").addEventListener("submit", function(event) {
+        // Prevent the default form submission
+        event.preventDefault();
 
-        // Send a POST request to the API with the file data
-        fetch("/", {
+        // Create a FormData object with the form data
+        var formData = new FormData(event.target);
+
+        // Send a POST request to the API with the form data
+        fetch("/process_video", {
             method: "POST",
             body: formData
         })
@@ -25,6 +27,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Draw the plot on the canvas
             drawPlot(data.plot_data);
+
+            // Display additional results
+            document.getElementById("results").innerHTML = JSON.stringify(data);
         })
         .catch(error => console.log(error));
     });
