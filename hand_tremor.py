@@ -167,5 +167,17 @@ def main(video_path):
     # Plot the tremor signal and frequency spectrum
     plot_tremor_signal(time, tremor_signal_cm)
 
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+
+@app.route('/process_video', methods=['POST'])
+def process_video():
+    if 'file' not in request.files:
+        return jsonify({'error': 'no file'}), 400
+    file = request.files['file']
+    video_path = file.save(file.filename)
+    main(video_path)
+    return jsonify({'result': 'success'}), 200
+
 if __name__ == "__main__":
-    main(r"D:\\Jupyter Notebooks\\Freelancing\\cv-tremor-amplitude-main\\Videos\\ex_vid.mp4")
+    app.run(debug=True)
